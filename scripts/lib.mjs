@@ -34,14 +34,22 @@ export const USER_AGENT = "kenogo-oracle data pipeline (github.com/TonyJason1/ke
  * a truncation point, possibly rolling retention; floor-scan handles drift). */
 export const FLOOR_BUCKET = "2022-10-18T00";
 
-/** Cadence era pin — MEASURED from the archive walk 2026-08-14 (the probe's
- * date-level "since 2024-05-21" was 8.5 h coarse): the last finished 180 s
- * draw is 2024-05-20T15:00:00Z, one SUSPENDED draw sits at ~15:02:55 (never
- * finished — excluded by doctrine), then a ~31.5 min changeover outage, and
- * the 160 s era begins at exactly 2024-05-20T15:31:40Z (gap 1900 s, ledgered
- * as the single era-crossing anomaly). Verified steady 160 s through the
- * 16:00 and 23:00 buckets of the same day. */
+/** Cadence era pin, SECOND precision — measured from the archive walk
+ * 2026-08-14 (the probe report's date-level "since 2024-05-21" was 8.5 h
+ * coarse; the walk's refusal at the boundary pinned the truth), re-verified
+ * from the live API 2026-08-13T20:35:18Z over buckets 2024-05-20T13..T18:
+ *   - 40/40 pre-seam gaps exactly 180 s; last 180 s draw
+ *     2024-05-20T15:00:00Z (externalId 980)
+ *   - one SUSPENDED item at 15:02:55 (never finished — excluded by
+ *     doctrine), then the changeover outage
+ *   - first 160 s draw 2024-05-20T15:31:40Z (externalId 991); 78/78
+ *     subsequent gaps exactly 160 s (>= 50 required to pin)
+ * The single 1900 s transition gap is ledgered by exact timestamp + duration
+ * in data/anomalies.json; judgeGap admits THAT pair and no other — no
+ * wildcard tolerance exists at the seam. */
+export const ERA_180_END_MS = Date.parse("2024-05-20T15:00:00Z");
 export const ERA_160_START_MS = Date.parse("2024-05-20T15:31:40Z");
+export const ERA_SEAM_GAP_MS = ERA_160_START_MS - ERA_180_END_MS; // exactly 1,900,000
 export const GAP_160_MS = 160_000;
 export const GAP_180_MS = 180_000;
 
@@ -179,7 +187,7 @@ export function expectedGapMs(laterMs) {
  * bucket cannot pass it.
  *   { ok: true }                          exact cadence gap
  *   { ledger: {...} }                     accepted, but recorded loudly:
- *       type "era-crossing"  the single 180→160 boundary pair
+ *       type "era-crossing"  ONLY the measured 180→160 changeover pair
  *       type "missed-slots"  gap = k × cadence (2..MAX_MISSED_SLOTS)
  *   { fatal: "..." }                      corruption — refuse the write
  */
@@ -190,12 +198,22 @@ export function judgeGap(prevMs, laterMs) {
 
   const crossing = prevMs < ERA_160_START_MS && laterMs >= ERA_160_START_MS;
   if (crossing) {
-    if (gap > 48 * HOUR_MS) return { fatal: `era-crossing gap ${gap} ms exceeds 48 h — API hole` };
+    // Second-precision seam law: exactly one pair may cross the boundary —
+    // the measured changeover, to the second. Anything else straddling it is
+    // a hole or corruption, and no ledger entry can bless it: the law, not
+    // the ledger, decides crossings.
+    if (prevMs === ERA_180_END_MS && laterMs === ERA_160_START_MS) {
+      return {
+        ledger: {
+          type: "era-crossing",
+          detail: `180s→160s era boundary: ${iso(prevMs)} → ${iso(laterMs)} (gap ${gap / 1000}s)`
+        }
+      };
+    }
     return {
-      ledger: {
-        type: "era-crossing",
-        detail: `180s→160s era boundary: ${iso(prevMs)} → ${iso(laterMs)} (gap ${gap / 1000}s)`
-      }
+      fatal: `off-seam era crossing ${iso(prevMs)} → ${iso(laterMs)} (gap ${gap / 1000}s) — ` +
+             `the measured seam is ${iso(ERA_180_END_MS)} → ${iso(ERA_160_START_MS)} ` +
+             `(${ERA_SEAM_GAP_MS / 1000}s) and no other pair may cross it`
     };
   }
 

@@ -46,6 +46,11 @@ is kept for reconciliation only; the dedup/cursor key is `drawingDate`.
   about the world; anything else refuses the write. The audit re-derives the
   whole chain and requires cadence math − ledgered slots = stored count,
   exactly.
+- **Era correction:** the 2026-08-13 probe report pinned the cadence eras at
+  day granularity; the seam is mid-day, verified at second precision from the
+  live API (2026-08-13T20:35Z) — last 180 s draw 2024-05-20T15:00:00Z, one
+  ledgered 1900 s changeover pause, 160 s from 15:31:40Z, and only that exact
+  pair may cross.
 - **`data/stats.json`** — the ONLY data file the client loads (per-ball freq,
   last-seen, recency-decayed freq at 540-draw half-life, n, data-through).
   Regenerated deterministically from the CSVs; drift is a hard audit failure.

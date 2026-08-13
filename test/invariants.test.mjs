@@ -10,7 +10,8 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
-  CSV_HEADER, ERA_160_START_MS, GAP_160_MS, GAP_180_MS, MAX_MISSED_SLOTS,
+  CSV_HEADER, ERA_160_START_MS, ERA_180_END_MS, ERA_SEAM_GAP_MS,
+  GAP_160_MS, GAP_180_MS, MAX_MISSED_SLOTS,
   appendRecords, bucketOf, bucketUrl, bucketsBetween, headsTailsOf, judgeGap,
   monthOf, nextBucket, parseCsvLine, parseItem, readAllRecords, toCsvLine,
   toZ, validateChain
@@ -143,12 +144,28 @@ check("missed-slots: an exact cadence multiple is LEDGERED, never silent, never 
   ok(beyond.fatal, "beyond MAX_MISSED_SLOTS must be fatal (suspected API hole)");
 });
 
-check("era-crossing: the single boundary pair is ledgered with its measured gap", () => {
-  const prev = ERA_160_START_MS - 100_000, later = ERA_160_START_MS + 70_000;
-  const j = judgeGap(prev, later);
-  ok(j.ledger?.type === "era-crossing", "must ledger the crossing");
-  ok(/170s/.test(j.ledger.detail), "must record the measured gap");
-  ok(judgeGap(prev, prev + 49 * 3600 * 1000).fatal, "a 49 h 'crossing' is a hole, not a boundary");
+check("era-crossing: ONLY the measured seam pair passes, to the second", () => {
+  eq(ERA_SEAM_GAP_MS, 1_900_000, "the measured changeover pause");
+  const j = judgeGap(ERA_180_END_MS, ERA_160_START_MS);
+  ok(j.ledger?.type === "era-crossing", "the measured pair must ledger");
+  eq(j.ledger.detail,
+     "180s→160s era boundary: 2024-05-20T15:00:00Z → 2024-05-20T15:31:40Z (gap 1900s)",
+     "detail must stay byte-identical to the committed data/anomalies.json entry");
+});
+
+check("era-crossing: NO wildcard — every other straddling pair is fatal", () => {
+  const cases = [
+    [ERA_160_START_MS - 100_000, ERA_160_START_MS + 70_000, "a synthetic 170 s straddle"],
+    [ERA_180_END_MS - GAP_180_MS, ERA_160_START_MS, "crossing FROM one 180 s draw early"],
+    [ERA_180_END_MS, ERA_160_START_MS + GAP_160_MS, "crossing TO one 160 s draw late"],
+    [ERA_180_END_MS - 1000, ERA_160_START_MS, "prev off the seam by 1 s"],
+    [ERA_180_END_MS, ERA_160_START_MS + 1000, "gap 1901 s"],
+    [ERA_180_END_MS, ERA_180_END_MS + 49 * 3600 * 1000, "a 49 h 'crossing'"]
+  ];
+  for (const [prev, later, what] of cases) {
+    const j = judgeGap(prev, later);
+    ok(j.fatal && /off-seam era crossing/.test(j.fatal), `${what} must be fatal, got ${JSON.stringify(j)}`);
+  }
 });
 
 check("non-increasing drawingDate is fatal", () => {

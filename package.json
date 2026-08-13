@@ -1,13 +1,13 @@
 {
   "name": "kenogo-oracle",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "description": "KenoGO stats archive + crypto-random quick picks. Offline-capable PWA, zero runtime dependencies.",
   "scripts": {
     "icons": "node scripts/make-icons.mjs",
     "test": "npm run test:core && npm run test:dom",
-    "test:core": "node test/rng.test.mjs && node test/invariants.test.mjs && node test/backfill.test.mjs && node test/stats.test.mjs && node test/freshness.test.mjs && node test/sw.test.mjs && node test/workflows.test.mjs && node test/version.test.mjs",
+    "test:core": "node test/rng.test.mjs && node test/invariants.test.mjs && node test/backfill.test.mjs && node test/seam.test.mjs && node test/stats.test.mjs && node test/freshness.test.mjs && node test/sw.test.mjs && node test/workflows.test.mjs && node test/version.test.mjs",
     "test:dom": "node test/ui.test.mjs",
     "backfill": "node scripts/backfill.mjs",
     "update-data": "node scripts/update-data.mjs",
