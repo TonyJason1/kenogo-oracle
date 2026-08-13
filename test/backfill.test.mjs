@@ -290,6 +290,29 @@ await check("floor-scan advances over pre-floor emptiness and records the discov
   rmSync(dir, { recursive: true, force: true });
 });
 
+await check("single-writer lock: a held lock REFUSES a second walker, archive untouched", async () => {
+  // Born from the 2026-08-14 incident: an orphaned first walker + a resumed
+  // second interleaved 242,620 duplicate rows. Never again.
+  const dir = freshDir();
+  await walk(dir, { maxBuckets: 1 });
+  const before = allRecords(dir).length;
+  writeFileSync(join(dir, "walk.lock"), JSON.stringify({ pid: process.pid, startedAt: "2026-01-01T00:00:00Z" }));
+  let threw = null;
+  try { await walk(dir, { maxBuckets: 1 }); } catch (err) { threw = err; }
+  ok(threw && /another walker/.test(threw.message), `must refuse loudly (got ${threw?.message})`);
+  eq(allRecords(dir).length, before, "nothing appended under a held lock");
+  rmSync(dir, { recursive: true, force: true });
+});
+
+await check("single-writer lock: a STALE lock (dead pid) is broken and the walk proceeds", async () => {
+  const dir = freshDir();
+  writeFileSync(join(dir, "walk.lock"), JSON.stringify({ pid: 999983, startedAt: "2026-01-01T00:00:00Z" }));
+  const r = await walk(dir, { maxBuckets: 1 });
+  ok(r.draws > 0, "walk proceeds past a dead holder");
+  ok(!readJson(join(dir, "walk.lock")), "lock released after the walk");
+  rmSync(dir, { recursive: true, force: true });
+});
+
 await check("a CRLF checkout parses cleanly and repair never eats good lines", async () => {
   // .gitattributes pins LF, but a stray CRLF working copy must degrade to
   // TOLERATED, never to "torn": before this guard, repairMonthFile would

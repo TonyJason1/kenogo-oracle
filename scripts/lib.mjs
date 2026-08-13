@@ -18,7 +18,9 @@
  *   `odds` paytable we strip and never store.
  */
 
-import { mkdirSync, readFileSync, readdirSync, statSync, truncateSync } from "node:fs";
+import {
+  mkdirSync, readFileSync, readdirSync, statSync, truncateSync, unlinkSync, writeFileSync
+} from "node:fs";
 import { appendFile, readFile, rename, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
@@ -407,6 +409,46 @@ export async function fetchBucket(bucket, { fetchImpl = fetch, retryDelayMs = 10
   throw new Error(`bucket ${bucket}: ${lastErr.message}`);
 }
 
+/* -------------------------------------------------------- single writer */
+
+function pidAlive(pid) {
+  try { process.kill(pid, 0); return true; }
+  catch (err) { return err.code === "EPERM"; } // exists but not ours
+}
+
+/**
+ * Exclusive-create lockfile so a second walker can NEVER append in parallel.
+ * Born from a real incident (2026-08-14): a stopped wrapper shell orphaned
+ * its node child, the resumed walk ran alongside it, and the two interleaved
+ * 242,620 duplicate rows before the audit caught it. A held lock with a live
+ * pid refuses loudly; a stale lock (dead pid — crash, power loss) is broken
+ * automatically. Returns the release function.
+ */
+export function acquireWalkLock(dataDir) {
+  mkdirSync(dataDir, { recursive: true });
+  const path = join(dataDir, "walk.lock");
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      writeFileSync(path, JSON.stringify({
+        pid: process.pid,
+        startedAt: new Date().toISOString().replace(/\.\d{3}Z$/, "Z")
+      }) + "\n", { flag: "wx" });
+      return () => { try { unlinkSync(path); } catch { /* already gone */ } };
+    } catch {
+      const held = readJson(path);
+      if (held && Number.isInteger(held.pid) && pidAlive(held.pid)) {
+        throw new Error(
+          `walk refused: another walker (pid ${held.pid}, since ${held.startedAt}) holds ${path} — ` +
+          `two writers interleave and duplicate the archive. Stop it (verify with ` +
+          `Get-CimInstance Win32_Process) or wait for it to finish.`
+        );
+      }
+      try { unlinkSync(path); } catch { /* raced its own release */ }
+    }
+  }
+  throw new Error(`could not acquire ${path} after breaking a stale lock`);
+}
+
 /* ------------------------------------------------------------- the walk */
 
 /**
@@ -435,6 +477,9 @@ export async function walkBuckets(opts) {
   } = opts;
   const drawsDir = join(dataDir, "draws");
   const cursorPath = join(dataDir, "cursor.json");
+
+  const releaseLock = acquireWalkLock(dataDir);
+  try {
 
   let tail = lastRecordOnDisk(drawsDir);
   const cursor = readJson(cursorPath);
@@ -541,6 +586,10 @@ export async function walkBuckets(opts) {
   if (out.buckets >= maxBuckets) out.stopped = "max-buckets";
   out.tail = tail;
   return out;
+
+  } finally {
+    releaseLock();
+  }
 }
 
 /* --------------------------------------------------------------- stats */

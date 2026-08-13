@@ -77,6 +77,15 @@ CSV archive `data/draws/YYYY-MM.csv` (UTC month of drawingDate), header:
 
 - `npm run backfill` — local, oldest-first from the floor, ~9 h at 1 req/s.
   Interruptible + resumable at any point. NEVER run it in Actions.
+- **ONE WALKER AT A TIME — enforced by `data/walk.lock`** (exclusive-create,
+  live-pid check, stale locks broken automatically). Incident 2026-08-14:
+  killing a wrapper SHELL orphaned its node child, the resumed walk ran
+  alongside it, and the pair interleaved 242,620 duplicate rows (caught by
+  the audit's ordering + slot-math gates, repaired by sort/dedupe — the
+  duplicates were byte-identical). Launch walkers as a DIRECT node command,
+  verify death with `Get-CimInstance Win32_Process -Filter "Name='node.exe'"`
+  before resuming, and never pipe an audit into anything that eats its exit
+  code (`node scripts/audit-data.mjs && git commit ...`, not `| tail`).
 - `.github/workflows/update-data.yml` — 6-hourly cursor walk (~7 buckets).
   While the archive is still catching up (cursor gap > `CATCHUP_BUCKETS`),
   the Action **exits 0 without fetching or committing** — it must not fight
