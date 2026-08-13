@@ -63,6 +63,18 @@
       <p class="matrix-line" id="matrixLine">10 spots from 1–80 · drawn 20-from-80 every 160 s</p>
     </section>
 
+    <!-- Oracle intensity dial: ONE persisted dial (single game). Buttons are
+         built by app.js FROM the preset constants so markup can never
+         disagree with the engine. Weights stay in [1, 1+I] structurally —
+         no ball is ever excluded, and odds are untouched (see the bar note). -->
+    <section class="card oracle" id="oracleCard">
+      <div class="oracle-head">
+        <span class="qty-label" id="dialLabel">Oracle tilt</span>
+        <span class="oracle-status" id="oracleStatus"></span>
+      </div>
+      <div class="dial" id="intensityDial" role="radiogroup" aria-labelledby="dialLabel"></div>
+    </section>
+
     <!-- Results -->
     <section class="card results" id="resultsCard" hidden>
       <div class="results-head">
@@ -75,6 +87,17 @@
       <p id="revealStatus" class="sr-only" role="status" aria-live="polite"></p>
     </section>
 
+    <!-- The Reading: filled only AFTER the reveal completes (no spoilers).
+         Every number comes from the same functions the sampler used. -->
+    <details class="card reading" id="readingBox" hidden>
+      <summary>
+        <span>The Reading</span>
+        <span class="spec">line 1</span>
+      </summary>
+      <p class="reading-head" id="readingHead"></p>
+      <div id="readingList"></div>
+    </details>
+
     <!-- History -->
     <details class="card history" id="historyBox">
       <summary>
@@ -83,6 +106,18 @@
       </summary>
       <div id="historyList"></div>
       <button type="button" class="ghost-btn danger" id="clearHistoryBtn">Clear history</button>
+    </details>
+
+    <!-- Archive flavour: observed side-bet outcomes. DISPLAY-ONLY — these
+         numbers never feed pick weights. -->
+    <details class="card flavour" id="flavourBox" hidden>
+      <summary>
+        <span>Archive flavour</span>
+        <span class="spec">display-only</span>
+      </summary>
+      <p class="flavour-note">Side-bet outcomes across the archive. For reading, not for picking —
+        these never touch the weights.</p>
+      <div id="flavourList"></div>
     </details>
 
     <footer class="foot">
@@ -94,7 +129,7 @@
            line is filled from data/stats.json at runtime and tightened by the
            live top-up — data commits ship without a VERSION bump, so it
            cannot live in this file. -->
-      <p class="build">v0.1.1<span id="dataThrough"></span></p>
+      <p class="build">v0.2.0<span id="dataThrough"></span></p>
     </footer>
   </div>
 

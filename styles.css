@@ -139,6 +139,29 @@ body {
 .matrix-line { margin: 12px 0 0; font-size: 12px; color: var(--muted); text-align: center; }
 .spec { color: var(--accent); font-weight: 800; font-variant-numeric: tabular-nums; }
 
+/* ---------- oracle dial ---------- */
+.oracle-head {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
+  margin-bottom: 10px;
+}
+.oracle-status { font-size: 11px; color: var(--muted); text-align: right; }
+.dial { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.dial-btn {
+  min-height: 52px; padding: 6px 2px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  border-radius: 12px; border: 1px solid var(--line);
+  background: var(--navy-2); color: var(--ink);
+  cursor: pointer; touch-action: manipulation;
+}
+.dial-btn .dial-name { font-size: 12.5px; font-weight: 700; }
+.dial-btn .dial-cap { font-size: 10px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.dial-btn[aria-checked="true"] {
+  border-color: var(--accent);
+  background: rgba(255, 176, 46, 0.14);
+}
+.dial-btn[aria-checked="true"] .dial-name { color: var(--accent); }
+.dial-btn:focus-visible { outline: 3px solid #ffd34d; outline-offset: 2px; }
+
 /* ---------- results ---------- */
 .results-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .results-head h2 { margin: 0; font-size: 15px; letter-spacing: .06em; }
@@ -184,6 +207,55 @@ body {
   cursor: pointer; touch-action: manipulation;
 }
 .ghost-btn.danger { color: #ff8ba0; border-color: rgba(255,139,160,.4); width: 100%; margin-top: 10px; }
+
+/* ---------- the Reading ---------- */
+.reading summary, .flavour summary {
+  display: flex; justify-content: space-between; align-items: center;
+  cursor: pointer; list-style: none;
+  min-height: 30px; font-weight: 600; font-size: 14px;
+}
+.reading summary::-webkit-details-marker, .flavour summary::-webkit-details-marker { display: none; }
+.reading-head {
+  margin: 10px 0 4px;
+  font-size: 11.5px; color: var(--muted);
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+.r-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  border-top: 1px solid var(--line);
+  padding: 8px 0;
+  font-size: 12px;
+}
+.r-ball {
+  flex: 0 0 30px; height: 30px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 35% 30%, #ffffff 0%, #f4e9cf 70%, #e8cf9a 100%);
+  border: 2px solid var(--accent);
+  color: #201302; font-weight: 800; font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+.r-lines { flex: 1; display: flex; flex-direction: column; gap: 2px; color: var(--muted); }
+.r-lines span:first-child { color: var(--ink); }
+.r-lines span { font-variant-numeric: tabular-nums; }
+
+/* ---------- archive flavour ---------- */
+.flavour-note {
+  margin: 10px 0 4px;
+  font-size: 11.5px; color: var(--muted);
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+.f-group { margin: 10px 0 2px; font-size: 12px; font-weight: 700; color: var(--ink); }
+.f-row {
+  display: flex; align-items: baseline; gap: 10px;
+  border-top: 1px solid var(--line);
+  padding: 6px 0;
+  font-size: 12px; color: var(--muted);
+}
+.f-label { flex: 1; }
+.f-obs { flex: 0 0 auto; }
+.f-ref { flex: 0 0 auto; font-variant-numeric: tabular-nums; font-size: 11px; }
 
 /* ---------- history ---------- */
 .history summary {

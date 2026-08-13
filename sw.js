@@ -17,8 +17,8 @@
  * Cross-origin requests (the live KenoGO API top-up) pass straight through,
  * uncached and unintercepted.
  */
-const VERSION = "v0.1.1";
-const STATS_SCHEMA = "v1"; // bump ONLY when data/stats.json shape changes
+const VERSION = "v0.2.0";
+const STATS_SCHEMA = "v2"; // bump ONLY when data/stats.json shape changes
 
 const SHELL_CACHE = `kenogo-oracle-shell-${VERSION}`;
 const DATA_CACHE = `kenogo-oracle-data-${STATS_SCHEMA}`;
@@ -33,6 +33,7 @@ const SHELL = [
   "./app.js",
   "./rng.js",
   "./js/live.js",
+  "./js/oracle.js",
   "./js/reveal.js",
   "./js/history.js",
   "./manifest.webmanifest",

@@ -15,6 +15,10 @@
  *   ledger     — cadence math vs actual count disagrees with the ledger
  *   coverage   — a ball absent from an archive big enough to make that
  *                impossible (n >= 500 → P < 1e-6)
+ *   identity   — Σ per-ball counts ≠ 20 × n (every record carries exactly
+ *                20 balls; stats consumers derive balls-per-draw from this)
+ *   weekly-chi2 — trailing-week corrected chi² at or past the corruption
+ *                threshold (typical fluctuation stays report-only)
  *   stats      — data/stats.json missing or drifted from the files on disk
  *   freshness  — more draws pending than one refresh cycle explains
  *                (suspended in catch-up mode unless --strict; the local
@@ -25,8 +29,8 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import {
-  CATCHUP_BUCKETS, ERA_160_START_MS, GAP_160_MS, GAP_180_MS,
-  computeStats, judgeGap, readAllRecords, readJson
+  CATCHUP_BUCKETS, DRAWN, ERA_160_START_MS, GAP_160_MS, GAP_180_MS, POOL,
+  WEEK_DRAWS, chi2Corrected, computeStats, judgeGap, readAllRecords, readJson
 } from "./lib.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -79,6 +83,10 @@ const ballSeen = new Array(80).fill(0);
 const htHist = { heads: 0, tails: 0, evens: 0 };
 const bonusHist = new Map();
 const jackpotHist = new Map();
+/* Trailing-week ring buffer for the weekly chi-square: per-ball counts over
+ * the last WEEK_DRAWS records, maintained in the same single pass. */
+const weekFreq = new Array(80).fill(0);
+const weekRing = new Array(WEEK_DRAWS).fill(null);
 
 try {
   for (const rec of readAllRecords(DRAWS_DIR)) {
@@ -104,6 +112,10 @@ try {
       }
     }
     for (const b of rec.numbers) ballSeen[b - 1]++;
+    const slot = n % WEEK_DRAWS;
+    if (weekRing[slot]) for (const b of weekRing[slot]) weekFreq[b - 1]--;
+    weekRing[slot] = rec.numbers;
+    for (const b of rec.numbers) weekFreq[b - 1]++;
     htHist[rec.headsTails]++;
     bonusHist.set(rec.bonusFactor, (bonusHist.get(rec.bonusFactor) ?? 0) + 1);
     jackpotHist.set(rec.jackpotLevel, (jackpotHist.get(rec.jackpotLevel) ?? 0) + 1);
@@ -172,6 +184,48 @@ if (!structureBad && !chainBad) {
   } else {
     const min = Math.min(...ballSeen), max = Math.max(...ballSeen);
     console.log(`ok   coverage: all 80 balls present (per-ball count ${fmt(min)}–${fmt(max)})`);
+  }
+}
+
+/* -------------------------------------- 3b. conservation identity */
+
+/* Every archived record carries exactly 20 balls (parseCsvLine enforces the
+ * shape), so Σ per-ball counts === 20 × n ALWAYS. Stats consumers lean on
+ * this: the client re-derives balls-per-draw from Σfreq/n instead of
+ * trusting a stored constant. Cheap, and the one check that would catch a
+ * tallying logic drift no byte-compare can. */
+{
+  const total = ballSeen.reduce((a, b) => a + b, 0);
+  if (total !== n * DRAWN) {
+    fail("identity", `Σ per-ball counts = ${fmt(total)}, expected ${DRAWN} × ${fmt(n)} = ${fmt(n * DRAWN)}`);
+  } else {
+    console.log(`ok   identity: Σ per-ball counts = ${DRAWN} × n = ${fmt(total)} exactly`);
+  }
+}
+
+/* ------------------------------- 3c. weekly chi-square, trailing week */
+
+/* The chain-gap law proves the draws ARRIVED on schedule; this checks what
+ * is IN them. A feed that started serving garbled-but-parseable ball sets
+ * (valid 20-of-80, valid chain) would slip every structural gate — a wildly
+ * skewed per-ball distribution over the trailing week is the tell. The
+ * statistic is corrected for sampling without replacement (×79/60 — the
+ * repo's pinned convention; the probe-week fixture reproduces raw 48.14 →
+ * corrected 63.38 @ 79 dof). Typical fluctuation is REPORT-ONLY, per the
+ * reconciliation doctrine; the named hard fail is promoted at birth only for
+ * the corruption regime: chi² ≥ 180 is p ≈ 1e-9 at 79 dof, so four runs a
+ * day false-alarm about once in 10^5 years, while a garbled feed lands
+ * orders of magnitude past it. */
+const CHI2_WEEKLY_FATAL = 180;
+{
+  const windowN = Math.min(n, WEEK_DRAWS);
+  const chi2 = chi2Corrected(weekFreq, windowN);
+  const label = `corrected chi² ${chi2.toFixed(2)} @ ${POOL - 1} dof over the trailing ${fmt(windowN)} draw(s)`;
+  if (chi2 >= CHI2_WEEKLY_FATAL) {
+    fail("weekly-chi2", `${label} — at or past the corruption threshold ${CHI2_WEEKLY_FATAL} (p ≈ 1e-9): ` +
+      `the feed is serving non-uniform ball sets; quarantine before trusting new data`);
+  } else {
+    console.log(`ok   weekly-chi2: ${label} (×79/60 without-replacement correction, fatal at ${CHI2_WEEKLY_FATAL})`);
   }
 }
 

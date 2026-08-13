@@ -94,17 +94,37 @@ CSV archive `data/draws/YYYY-MM.csv` (UTC month of drawingDate), header:
   math). In catch-up it REPORTS the gap instead of failing; `--strict`
   (post-updater, steady state) always enforces.
 
-## App doctrine (v0.1.x)
+## App doctrine (v0.2.x)
 
 - Selection is ALWAYS the CSPRNG (`rng.js` — rejection sampling, partial
   Fisher–Yates). The 80-ball chamber is presentation only, and degrades its
   ball count under frame pressure without ever touching selection.
 - Spots 1–10 (default 10), Lines 1–10 (default 1).
+- **The Oracle blend (js/oracle.js — quickpick-au Mk II design, keno
+  constants):** weight = 1 + I·(0.5·normFreq + 0.2·normGap + 0.3·normRecent)
+  over the stats.json aggregates; presets Subtle 0.25 / Classic 0.5 (default)
+  / Strong 1 / Maximum 2; the cap IS 1+I, structural, no clamping — no ball
+  can ever be starved. Sampler = acceptance–rejection over secureInt
+  (selection stays on the CSPRNG). ONE persisted dial. Recency half-life =
+  **3,780 draws (one week at 160 s), pinned INSIDE stats.json** — the client
+  always uses the in-file pin, never a local constant, so Action and client
+  cannot disagree. Stats unavailable → picks degrade to plain uniform
+  drawLine and the Oracle panels hide.
+- **One-formatter law:** the Reading panel and the sampler share
+  tiltComponents; panel weight === sampling weight is asserted in tests.
+  The live top-up validates every new item to the pipeline's bar and ONE
+  garbled item aborts the whole top-up — footer, Reading and sampler always
+  describe the same merged state.
+- **Guards that gate:** adjacency tripwire (closed form 1 − C(71,10)/C(80,10)
+  etc., offsets measured at 1M lines/case, gates ±1pp / ±1.25pp at Maximum,
+  ≥4σ headroom), frozen-stats marginals fixture (10M-line reference, k=10,
+  Classic+Maximum), Σfreq = 20·n identity, weekly corrected χ² in the audit
+  (×79/60, fatal only at 180). Re-measure offsets + regenerate the marginals
+  fixture after ANY sampler or blend change.
 - Disclosure discipline: entertainment only; **every combination of your spot
   count has identical odds** (odds differ BETWEEN spot counts — never imply
-  otherwise); no expected-value claims, ever. Gambling help link stays in the
-  footer. The Oracle module (era-weighted picks) is a LATER session — do not
-  scaffold it early.
+  otherwise); no expected-value claims, ever. The side-bet flavour panel is
+  display-only and says so. Gambling help link stays in the footer.
 - Prefs are salvaged field-by-field (one corrupt key must not discard the
   rest). localStorage reads never throw into module init.
 
@@ -135,7 +155,9 @@ CSV archive `data/draws/YYYY-MM.csv` (UTC month of drawingDate), header:
 ## Layout
 
     index.html styles.css app.js rng.js sw.js manifest.webmanifest
-    js/live.js            client stats + live top-up (footer tightening)
+    js/live.js            client stats + live top-up (validated draws + footer)
+    js/oracle.js          the Oracle blend engine (weights, sampler, Reading,
+                          merge, flavour — pure, shared by app and tests)
     scripts/lib.mjs       shared data core: API client, parse/trim, validators,
                           CSV io, cursor io (pure functions, exported for tests)
     scripts/backfill.mjs  local archive walk (oldest-first, resumable)
@@ -148,6 +170,8 @@ CSV archive `data/draws/YYYY-MM.csv` (UTC month of drawingDate), header:
 
 ## Current state
 
-v0.1.0 (Session 1): repo + data layer + generator. Backfill runs locally and
-resumes across sessions; archive completeness is a follow-up, not a blocker.
-NO Oracle yet — Session 2.
+v0.2.0 (Session 2): the Oracle. Blend + intensity dial + Reading panel +
+live top-up merge + side-bet flavour + statistical guards, over the complete
+718,947-draw archive (backfilled to the live edge 2026-08-13; the 6-hourly
+Action owns the walk from here). stats.json is schema 2 (halfLifeDraws 3780
++ sideBets aggregates). v0.1.0 was Session 1: repo + data layer + generator.

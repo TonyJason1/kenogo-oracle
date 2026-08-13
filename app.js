@@ -1,11 +1,18 @@
 /* KenoGO Oracle — app logic. Selection is ALWAYS the CSPRNG (rng.js);
- * the 80-ball chamber is presentation only, and under frame pressure it
+ * the Oracle blend only tilts acceptance probabilities inside it, and when
+ * stats are unavailable picks degrade to plain uniform crypto-random. The
+ * 80-ball chamber is presentation only, and under frame pressure it
  * degrades its BALL COUNT, never the selection. Entertainment only — every
  * combination of your spot count has identical odds. */
 import { drawLine, shuffled } from "./rng.js";
 import { clearHistory, loadHistory, saveHistory } from "./js/history.js";
 import { pillsHTML, revealBall, revealRemaining } from "./js/reveal.js";
 import { initFooter } from "./js/live.js";
+import {
+  DEFAULT_INTENSITY, INTENSITY_PRESETS, flavourReadings, intensityOf,
+  intensityPreset, mergeStats, oracleStats, pct1, pickOracleLine,
+  readingHeader, readingLines
+} from "./js/oracle.js";
 
 /* ---------------------------------------------------------------- game */
 const POOL = 80;
@@ -19,6 +26,7 @@ const PREFS_KEY = "kg_prefs_v1";
 const state = {
   spots: SPOTS_DEFAULT,
   lines: LINES_DEFAULT,
+  intensity: DEFAULT_INTENSITY, // the ONE Oracle dial (single game)
   fastReveal: false,     // skip the chamber — results land instantly
   animating: false
 };
@@ -31,6 +39,9 @@ try {
   if (saved && typeof saved === "object") {
     if (Number.isInteger(saved.spots)) state.spots = clamp(saved.spots, SPOTS_MIN, SPOTS_MAX);
     if (Number.isInteger(saved.lines)) state.lines = clamp(saved.lines, LINES_MIN, LINES_MAX);
+    if (typeof saved.intensity === "string" && intensityPreset(saved.intensity)) {
+      state.intensity = saved.intensity; // unknown preset → default, not fatal
+    }
     state.fastReveal = saved.fastReveal === true;
   }
 } catch { /* fresh start */ }
@@ -38,7 +49,8 @@ try {
 function savePrefs() {
   try {
     localStorage.setItem(PREFS_KEY, JSON.stringify({
-      spots: state.spots, lines: state.lines, fastReveal: state.fastReveal
+      spots: state.spots, lines: state.lines, intensity: state.intensity,
+      fastReveal: state.fastReveal
     }));
   } catch { /* storage full/blocked — non-fatal */ }
 }
@@ -53,7 +65,10 @@ const els = {
   matrixLine: $("matrixLine"), resultsCard: $("resultsCard"), resultsList: $("resultsList"),
   copyAllBtn: $("copyAllBtn"), historyBox: $("historyBox"), historyList: $("historyList"),
   historyCount: $("historyCount"), clearHistoryBtn: $("clearHistoryBtn"), drawBtn: $("drawBtn"),
-  revealStatus: $("revealStatus"), dataThrough: $("dataThrough")
+  revealStatus: $("revealStatus"), dataThrough: $("dataThrough"),
+  intensityDial: $("intensityDial"), oracleStatus: $("oracleStatus"),
+  readingBox: $("readingBox"), readingHead: $("readingHead"), readingList: $("readingList"),
+  flavourBox: $("flavourBox"), flavourList: $("flavourList")
 };
 
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
@@ -413,6 +428,116 @@ for (const btn of els.pickControls.querySelectorAll(".step-btn")) {
   }
 }
 
+/* ------------------------------------------------------------- oracle */
+/* ONE data state, shared by the footer, the Reading panel and the sampler
+ * (the one-formatter law needs one state to format). `raw` is the
+ * stats.json shape (archive, or archive + live merge); `prepared` is the
+ * validated engine view, null when the Oracle must degrade to plain
+ * uniform crypto picks. */
+const oracle = { raw: null, prepared: null, live: false, error: null };
+
+function setOracleData(raw, live) {
+  oracle.raw = raw;
+  oracle.live = live;
+  try {
+    oracle.prepared = oracleStats(raw);
+    oracle.error = null;
+  } catch (err) {
+    oracle.prepared = null;
+    oracle.error = err.message;
+    console.error(`oracle disabled: ${err.message}`);
+  }
+  syncOracleStatus();
+  renderFlavour();
+}
+
+function syncOracleStatus() {
+  if (!els.oracleStatus) return;
+  if (oracle.prepared) {
+    els.oracleStatus.textContent =
+      `blend over ${oracle.prepared.n.toLocaleString("en-AU")} draws${oracle.live ? " · live" : ""}`;
+  } else {
+    els.oracleStatus.textContent = "no stats yet — picks are plain crypto-random";
+  }
+}
+
+/* The intensity dial: a radiogroup built FROM the preset constants so the
+ * markup can never disagree with the engine. Roving tabindex; Arrow/Home/
+ * End as the role promises. Changing it mid-animation affects the NEXT
+ * draw — the spec is captured at draw time. */
+function buildIntensityDial() {
+  els.intensityDial.innerHTML = "";
+  for (const p of INTENSITY_PRESETS) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "dial-btn";
+    btn.dataset.key = p.key;
+    btn.setAttribute("role", "radio");
+    btn.innerHTML = `<span class="dial-name"></span><span class="dial-cap"></span>`;
+    btn.querySelector(".dial-name").textContent = p.label;
+    btn.querySelector(".dial-cap").textContent = `${+(1 + p.I).toFixed(2)}× cap`;
+    btn.addEventListener("click", () => setIntensity(p.key));
+    els.intensityDial.appendChild(btn);
+  }
+  els.intensityDial.addEventListener("keydown", (e) => {
+    const keys = INTENSITY_PRESETS.map((p) => p.key);
+    const at = keys.indexOf(state.intensity);
+    const to =
+      e.key === "ArrowRight" || e.key === "ArrowDown" ? Math.min(keys.length - 1, at + 1) :
+      e.key === "ArrowLeft" || e.key === "ArrowUp" ? Math.max(0, at - 1) :
+      e.key === "Home" ? 0 : e.key === "End" ? keys.length - 1 : -1;
+    if (to === -1 || to === at) return;
+    e.preventDefault();
+    setIntensity(keys[to]);
+    els.intensityDial.querySelector(`[data-key="${keys[to]}"]`)?.focus();
+  });
+  syncIntensityDial();
+}
+
+function syncIntensityDial() {
+  for (const btn of els.intensityDial.querySelectorAll(".dial-btn")) {
+    const on = btn.dataset.key === state.intensity;
+    btn.setAttribute("aria-checked", String(on));
+    btn.tabIndex = on ? 0 : -1;
+  }
+}
+
+function setIntensity(key) {
+  if (!intensityPreset(key)) return;
+  state.intensity = key;
+  savePrefs();
+  syncIntensityDial();
+}
+
+/* Side-bet flavour: DISPLAY-ONLY archive shares (never feeds weights).
+ * Heads/tails/evens carry the exact hypergeometric reference; jackpot level
+ * and bonus factor are operator-scheduled, so observed shares only. */
+function renderFlavour() {
+  const f = oracle.raw ? flavourReadings(oracle.raw) : null;
+  if (!f) { els.flavourBox.hidden = true; return; }
+  els.flavourList.innerHTML = "";
+  const group = (title, rows) => {
+    const h = document.createElement("p");
+    h.className = "f-group";
+    h.textContent = title;
+    els.flavourList.appendChild(h);
+    for (const r of rows) {
+      const div = document.createElement("div");
+      div.className = "f-row";
+      div.innerHTML = `<span class="f-label"></span><span class="f-obs spec"></span><span class="f-ref"></span>`;
+      div.querySelector(".f-label").textContent = r.label;
+      div.querySelector(".f-obs").textContent = pct1(r.observed);
+      div.querySelector(".f-ref").textContent =
+        r.reference !== null ? `maths ${pct1(r.reference)}` : `${r.count.toLocaleString("en-AU")}×`;
+      els.flavourList.appendChild(div);
+    }
+  };
+  group("Heads or Tails — observed vs the maths", f.headsTails);
+  group("Jackpot level — observed", f.jackpot);
+  group(`Bonus factor — observed (n = ${f.n.toLocaleString("en-AU")})`, f.bonus);
+  els.flavourBox.hidden = false;
+}
+
 /* -------------------------------------------------------------- draw */
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let skipRequested = false;
@@ -438,13 +563,25 @@ async function onDraw() {
   if (state.animating) return;
   const spots = state.spots;
 
-  // 1) Selection — CSPRNG first, always.
+  // The draw spec is CAPTURED NOW — dial moves or live top-ups landing
+  // after this instant describe the NEXT draw, never this one. The Reading
+  // must describe the weights THIS draw actually used.
+  const spec = oracle.prepared
+    ? { intensityKey: state.intensity, stats: oracle.prepared, live: oracle.live }
+    : null;
+
+  // 1) Selection — CSPRNG first, always. The Oracle path tilts acceptance
+  //    inside the same CSPRNG; without stats it IS plain drawLine.
   const lines = [];
   for (let i = 0; i < state.lines; i++) {
-    lines.push({ nums: drawLine(POOL, spots) });
+    lines.push({
+      nums: spec
+        ? pickOracleLine(spec.stats, spots, intensityOf(spec.intensityKey))
+        : drawLine(POOL, spots)
+    });
   }
 
-  pushHistory(spots, lines);
+  pushHistory(spots, lines, spec);
   renderHistory();
 
   const instant = reduceMotion.matches || state.fastReveal;
@@ -452,6 +589,7 @@ async function onDraw() {
   if (instant) {
     chamber.renderOnce();
     announceDraw(spots, lines);
+    renderReading(spec, lines[0]);
     return;
   }
 
@@ -469,6 +607,7 @@ async function onDraw() {
     chamber.flushExtractions();
     revealRemaining(lineOne(), lines[0]); // guarantee nothing stays hidden
     announceDraw(spots, lines);
+    renderReading(spec, lines[0]); // after the reveal — the panel must not spoil it
     state.animating = false;
     els.drawBtn.disabled = false;
     els.skipHint.hidden = true;
@@ -522,6 +661,31 @@ function renderResults(spots, lines, animateFirst) {
   els.resultsCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
+/* The Reading: per-ball count, corrected z, gap percentile and the weight
+ * equation — every number from the SAME functions the sampler used (the
+ * one-formatter law). Filled only after the reveal completes, so it cannot
+ * spoil line 1. Hidden entirely for degraded (uniform) picks. */
+function renderReading(spec, line) {
+  if (!els.readingBox) return;
+  if (!spec) { els.readingBox.hidden = true; return; }
+  els.readingHead.textContent = readingHeader(spec.stats, spec.intensityKey, { live: spec.live });
+  els.readingList.innerHTML = "";
+  const I = intensityOf(spec.intensityKey);
+  for (const n of line.nums) {
+    const div = document.createElement("div");
+    div.className = "r-item";
+    div.dataset.ball = String(n);
+    div.innerHTML =
+      `<span class="r-ball"></span>` +
+      `<span class="r-lines"><span></span><span></span><span></span></span>`;
+    div.querySelector(".r-ball").textContent = String(n);
+    const spans = div.querySelectorAll(".r-lines span");
+    readingLines(spec.stats, n, I).forEach((text, i) => { spans[i].textContent = text; });
+    els.readingList.appendChild(div);
+  }
+  els.readingBox.hidden = false;
+}
+
 /** One coalesced announcement per draw — never one per released ball. */
 function announceDraw(spots, lines) {
   if (!els.revealStatus) return;
@@ -561,9 +725,10 @@ async function copyText(text, btn) {
 }
 
 /* ------------------------------------------------------------ history */
-function pushHistory(spots, lines) {
+function pushHistory(spots, lines, spec = null) {
+  const preset = spec ? intensityPreset(spec.intensityKey) : null;
   saveHistory(localStorage, {
-    name: `${spots}-spot KenoGO`,
+    name: `${spots}-spot KenoGO${preset ? ` · ${preset.label}` : ""}`,
     ts: Date.now(),
     lines: lines.map((l) => ({ n: l.nums }))
   });
@@ -607,14 +772,23 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   addEventListener("load", () => navigator.serviceWorker.register("./sw.js"));
 }
 
-/* Footer data currency: archive stamp from data/stats.json (rides the SW
- * data cache — works offline once fetched, data commits need no VERSION
- * bump), tightened to "· live" when the CORS-open API answers and the gap is
- * small. Absent both (first visit offline), the version stands alone. */
-initFooter(els.dataThrough);
+/* Footer data currency + the Oracle's ONE data state: archive stamp from
+ * data/stats.json (rides the SW data cache — works offline once fetched,
+ * data commits need no VERSION bump), tightened to "· live" when the
+ * CORS-open API answers and the gap is small. The SAME onData events feed
+ * the Oracle state, so the footer, the Reading and the sampler can never
+ * describe different data. Absent both (first visit offline), the version
+ * stands alone and picks are plain crypto-random. */
+initFooter(els.dataThrough, {
+  onData: (stats, live) => {
+    setOracleData(live ? mergeStats(stats, live.draws) : stats, !!live);
+  }
+});
 
 /* ---------------------------------------------------------------- init */
 syncControls();
+buildIntensityDial();
+syncOracleStatus();
 renderHistory();
 chamber.setPool(POOL, ACCENT);
 startLoop();

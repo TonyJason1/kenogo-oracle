@@ -106,8 +106,23 @@ await check("saveHistory prepends and caps at HIST_MAX", () => {
 
 /* --------------------------------------------------------------- live */
 
-const STATS = { schema: 1, n: 1000, dataThrough: "2026-08-13T09:50:20Z" };
+const STATS = { schema: 2, n: 1000, dataThrough: "2026-08-13T09:50:20Z" };
 const jsonRes = (value) => ({ ok: true, status: 200, json: async () => value });
+
+/* Valid API items: the top-up now validates every NEW item to the pipeline's
+ * bar (20 unique ints, pinned side-bet sets, derived heads/tails match), so
+ * the mocks carry real-shaped payloads. */
+const NUMS_LOW = Array.from({ length: 20 }, (_, i) => i + 1);   // all ≤ 40 → heads
+const NUMS_HIGH = Array.from({ length: 20 }, (_, i) => i + 61); // all ≥ 41 → tails
+const mkItem = (ms, state = "finished", numbers = NUMS_LOW, sb = {}) => ({
+  state,
+  drawingDate: new Date(ms).toISOString().replace(/\.\d{3}Z$/, "+00:00"),
+  numbers,
+  sideBetResults: {
+    headsTails: numbers === NUMS_HIGH ? "tails" : "heads",
+    jackpot: "regular", bonus: 1, ...sb
+  }
+});
 
 await check("footer text carries stamp + count, and the live variant says so", () => {
   eq(footerText(STATS), " · draws to 13 Aug 2026 09:50 UTC · 1,000 draws");
@@ -118,13 +133,11 @@ await check("footer text carries stamp + count, and the live variant says so", (
 
 await check("liveTopUp tightens when the gap is small, counting only newer finished draws", async () => {
   const throughMs = Date.parse(STATS.dataThrough);
-  const mkItem = (ms, state = "finished") =>
-    ({ state, drawingDate: new Date(ms).toISOString().replace(/\.\d{3}Z$/, "+00:00") });
   const fetchImpl = async (url) => {
     if (!/date=/.test(url)) {
       // no-date window: recent finished + scheduled future + one already-archived
       return jsonRes({ items: [mkItem(throughMs), mkItem(throughMs + 160_000),
-        mkItem(throughMs + 320_000), mkItem(throughMs + 480_000, "opened")] });
+        mkItem(throughMs + 320_000, "finished", NUMS_HIGH), mkItem(throughMs + 480_000, "opened")] });
     }
     return jsonRes({ items: [mkItem(throughMs + 160_000)] }); // bucket overlap — must dedupe
   };
@@ -132,6 +145,42 @@ await check("liveTopUp tightens when the gap is small, counting only newer finis
   ok(live, "top-up must succeed");
   eq(live.newDraws, 2, "two NEW finished draws (archived + scheduled excluded, overlap deduped)");
   eq(live.dataThrough, "2026-08-13T09:55:40Z", "tightened to the newest live draw");
+  // The validated draws ride along for the Oracle merge, ascending.
+  eq(live.draws.length, 2);
+  eq(live.draws[0].drawingDate, "2026-08-13T09:53:00Z");
+  eq(live.draws[0].numbers.join(" "), NUMS_LOW.join(" "), "drawn order preserved");
+  eq(live.draws[0].headsTails, "heads");
+  eq(live.draws[1].headsTails, "tails");
+  eq(live.draws[1].jackpotLevel, "regular");
+  eq(live.draws[1].bonusFactor, 1);
+});
+
+await check("ONE garbled new item aborts the whole top-up — archive stands", async () => {
+  const throughMs = Date.parse(STATS.dataThrough);
+  const bad = mkItem(throughMs + 320_000);
+  bad.numbers = [...NUMS_LOW.slice(0, 19), 19]; // duplicate ball
+  const fetchImpl = async (url) => jsonRes({
+    items: /date=/.test(url) ? [] : [mkItem(throughMs + 160_000), bad]
+  });
+  eq(await liveTopUp(STATS, { fetchImpl, now: () => throughMs + 30 * 60_000 }), null,
+    "a poisoned weight is worse than a stale one");
+});
+
+await check("heads/tails cross-check: payload lying about its numbers aborts", async () => {
+  const throughMs = Date.parse(STATS.dataThrough);
+  const liar = mkItem(throughMs + 160_000, "finished", NUMS_LOW, { headsTails: "tails" });
+  const fetchImpl = async (url) => jsonRes({ items: /date=/.test(url) ? [] : [liar] });
+  eq(await liveTopUp(STATS, { fetchImpl, now: () => throughMs + 30 * 60_000 }), null);
+});
+
+await check("conflicting duplicates (same instant, different balls) abort", async () => {
+  const throughMs = Date.parse(STATS.dataThrough);
+  const fetchImpl = async (url) => jsonRes({
+    items: /date=/.test(url)
+      ? [mkItem(throughMs + 160_000, "finished", NUMS_HIGH)]
+      : [mkItem(throughMs + 160_000)]
+  });
+  eq(await liveTopUp(STATS, { fetchImpl, now: () => throughMs + 30 * 60_000 }), null);
 });
 
 await check(`liveTopUp refuses a gap wider than ${LIVE_MAX_BUCKETS} buckets (backfill territory)`, async () => {
@@ -155,14 +204,45 @@ await check("initFooter renders the archive stamp, then tightens to live", async
   const throughMs = Date.parse(STATS.dataThrough);
   const fetchImpl = async (url) => {
     if (/stats\.json$/.test(url)) return jsonRes(STATS);
-    if (!/date=/.test(url)) {
-      return jsonRes({ items: [{ state: "finished",
-        drawingDate: new Date(throughMs + 160_000).toISOString().replace(/\.\d{3}Z$/, "+00:00") }] });
-    }
+    if (!/date=/.test(url)) return jsonRes({ items: [mkItem(throughMs + 160_000)] });
     return jsonRes({ items: [] });
   };
   await initFooter(el, { fetchImpl, now: () => throughMs + 10 * 60_000 });
   ok(/1,001 draws · live$/.test(el.textContent), `tightened footer (got "${el.textContent}")`);
+});
+
+await check("initFooter onData: archive state first, then the live payload for the merge", async () => {
+  const el = document.createElement("span");
+  const throughMs = Date.parse(STATS.dataThrough);
+  const fetchImpl = async (url) => {
+    if (/stats\.json$/.test(url)) return jsonRes(STATS);
+    if (!/date=/.test(url)) return jsonRes({ items: [mkItem(throughMs + 160_000)] });
+    return jsonRes({ items: [] });
+  };
+  const events = [];
+  await initFooter(el, {
+    fetchImpl, now: () => throughMs + 10 * 60_000,
+    onData: (stats, live) => events.push({ n: stats.n, live: live ? live.draws.length : null })
+  });
+  eq(events.length, 2, "archive event then live event");
+  eq(events[0].live, null, "first: archive only");
+  eq(events[1].live, 1, "second: the validated draws ride along");
+});
+
+await check("initFooter onData fires once (archive) when the top-up finds nothing", async () => {
+  const el = document.createElement("span");
+  const fetchImpl = async (url) => {
+    if (/stats\.json$/.test(url)) return jsonRes(STATS);
+    return jsonRes({ items: [] });
+  };
+  const events = [];
+  await initFooter(el, {
+    fetchImpl, now: () => Date.parse(STATS.dataThrough) + 10 * 60_000,
+    onData: (stats, live) => events.push(live)
+  });
+  eq(events.length, 1);
+  eq(events[0], null);
+  ok(!/· live$/.test(el.textContent), "footer stays archive");
 });
 
 await check("initFooter with stats unreachable leaves the footer version-only", async () => {
@@ -204,6 +284,22 @@ await check("footer build line + dataThrough span + draw button are wired", () =
   eq(page.getElementById("drawBtn").textContent, "DRAW");
   ok(page.getElementById("chamber"), "chamber canvas");
   ok(page.getElementById("revealStatus").getAttribute("aria-live"), "coalesced announcer");
+});
+
+await check("oracle contract: dial radiogroup, Reading and flavour panels, no-spoiler default", () => {
+  const dial = page.getElementById("intensityDial");
+  eq(dial.getAttribute("role"), "radiogroup", "the dial is one radiogroup");
+  ok(page.getElementById("oracleStatus"), "oracle status line");
+  const reading = page.getElementById("readingBox");
+  ok(reading, "Reading panel exists");
+  ok(reading.hasAttribute("hidden"), "Reading ships hidden — filled only after a reveal");
+  ok(page.getElementById("readingHead"), "Reading header line");
+  ok(page.getElementById("readingList"), "Reading list");
+  const flavour = page.getElementById("flavourBox");
+  ok(flavour, "flavour panel exists");
+  ok(flavour.hasAttribute("hidden"), "flavour ships hidden until stats land");
+  ok(/display-only/.test(flavour.textContent), "flavour declares itself display-only");
+  ok(/never (touch|feed)/.test(flavour.textContent), "flavour disclaims weight influence");
 });
 
 console.log(`\nDOM suite: ${pass} passed, ${fail} failed`);

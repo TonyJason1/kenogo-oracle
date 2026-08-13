@@ -612,18 +612,70 @@ export async function walkBuckets(opts) {
 
 /* --------------------------------------------------------------- stats */
 
-export const STATS_SCHEMA = 1;
-export const HALF_LIFE_DRAWS = 540; // one 160 s-era day of draws
+export const STATS_SCHEMA = 2; // v2: halfLifeDraws 3780 + sideBets aggregates
+
+/** Recency half-life, in DRAWS — pinned INSIDE stats.json, so whichever
+ * stats file a client holds, its decay math travels with it and the Action
+ * and the client can never disagree.
+ *
+ * 3,780 = 7 × 540 = one week of the 160 s cadence. Why a week:
+ *   - quickpick-au's 52 meant "one year of WEEKLY draws"; at 540 draws/day a
+ *     draw-indexed 52 is 2.3 h — pure noise-chasing, not "form".
+ *   - One week is the natural recent-form horizon for a 24/7 game
+ *     (yesterday's session still counts, last month's doesn't), and it is
+ *     already this repo's canonical statistical window: the probe-week
+ *     chi-square fixture is exactly n = 3,780 draws.
+ *   - Noise floor: the decayed rate's effective sample is (1+d)/(1−d) ≈
+ *     2H/ln2 ≈ 10,900 draws → per-ball σ ≈ 1.7% relative, so the
+ *     between-ball spread the intensity dial amplifies is dominated by draws
+ *     that actually happened recently. At the old 540 it is 4.4%, and one
+ *     full 6-bucket live top-up (~135 draws) moves the archive term 16% —
+ *     the Reading would visibly churn between visits; at 3,780 the same
+ *     top-up moves it 2.4%.
+ *   - Draw units on purpose: the matrix is 20-of-80 in BOTH cadence eras
+ *     (ingest invariants prove it) — cadence affects time math only, never
+ *     ball stats, so no era arithmetic can leak into the decay. */
+export const HALF_LIFE_DRAWS = 3780;
+
+/** One week of the 160 s cadence — the weekly chi-square monitoring window
+ * (and, deliberately, the same span as HALF_LIFE_DRAWS). */
+export const WEEK_DRAWS = 3780;
+
+/**
+ * Pearson chi-square over per-ball frequencies, corrected for sampling
+ * WITHOUT replacement within a draw: drawing K of N per draw makes per-ball
+ * counts negatively correlated, so E[chi²_raw] is only (N−K)/(N−1) × (N−1)
+ * = 60 — the raw statistic is scaled by (N−1)/(N−K) = 79/60 before
+ * comparison against the chi²(79) reference. Same correction the RNG suite
+ * and the probe-week fixture pin (raw 48.14 → corrected 63.38 @ 79 dof).
+ */
+export function chi2Corrected(freq, windowN) {
+  const expected = (windowN * DRAWN) / POOL;
+  let raw = 0;
+  for (const c of freq) raw += (c - expected) ** 2 / expected;
+  return (raw * (POOL - 1)) / (POOL - DRAWN);
+}
 
 /**
  * Single pass over the archive → data/stats.json content. Deterministic
  * (no wall-clock field): the audit re-derives and byte-compares it.
+ *
+ * Conservation identity: every record carries exactly DRAWN balls (enforced
+ * by parseCsvLine), so Σfreq === n × 20 always — the client re-derives
+ * balls-per-draw from that identity instead of trusting a stored constant,
+ * and the audit hard-fails if it ever breaks.
+ *
+ * sideBets are DISPLAY-ONLY flavour aggregates (observed heads/tails/evens,
+ * jackpot-level and bonus-factor distributions). They never feed weights.
  */
 export function computeStats(recordIterator) {
   const freq = new Array(POOL).fill(0);
   const decayed = new Array(POOL).fill(0);
   const lastIndex = new Array(POOL).fill(-1);
   const d = Math.pow(0.5, 1 / HALF_LIFE_DRAWS);
+  const headsTails = { heads: 0, tails: 0, evens: 0 };
+  const jackpot = { regular: 0, minor: 0, major: 0 };
+  const bonus = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 10: 0 };
   let n = 0, first = null, last = null;
 
   for (const rec of recordIterator) {
@@ -633,6 +685,9 @@ export function computeStats(recordIterator) {
       decayed[ball - 1] += 1;
       lastIndex[ball - 1] = n;
     }
+    headsTails[rec.headsTails]++;
+    jackpot[rec.jackpotLevel]++;
+    bonus[rec.bonusFactor]++;
     if (!first) first = rec.drawingDate;
     last = rec.drawingDate;
     n++;
@@ -646,7 +701,8 @@ export function computeStats(recordIterator) {
     halfLifeDraws: HALF_LIFE_DRAWS,
     freq,
     lastSeenDrawsAgo: lastIndex.map((i) => (i === -1 ? null : n - 1 - i)),
-    decayedFreq: decayed.map((v) => Math.round(v * 1e6) / 1e6)
+    decayedFreq: decayed.map((v) => Math.round(v * 1e6) / 1e6),
+    sideBets: { headsTails, jackpot, bonus }
   };
 }
 

@@ -12,8 +12,8 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
-  HALF_LIFE_DRAWS, POOL, appendRecords, computeStats, headsTailsOf,
-  readAllRecords, writeStats
+  HALF_LIFE_DRAWS, POOL, STATS_SCHEMA, WEEK_DRAWS, appendRecords,
+  chi2Corrected, computeStats, headsTailsOf, readAllRecords, writeStats
 } from "../scripts/lib.mjs";
 
 let pass = 0, fail = 0;
@@ -29,11 +29,11 @@ function near(a, b, tol, what = "") {
 
 const WEEK = JSON.parse(readFileSync(new URL("./fixtures/week-freq.json", import.meta.url), "utf8"));
 
-function makeRec(ms, numbers) {
+function makeRec(ms, numbers, { jackpotLevel = "regular", bonusFactor = 1 } = {}) {
   return {
     drawingDate: new Date(ms).toISOString().replace(/\.\d{3}Z$/, "Z"),
     ms, externalId: "1", numbers,
-    headsTails: headsTailsOf(numbers), jackpotLevel: "regular", bonusFactor: 1
+    headsTails: headsTailsOf(numbers), jackpotLevel, bonusFactor
   };
 }
 const T0 = Date.parse("2026-01-01T00:00:00Z");
@@ -72,6 +72,32 @@ await check("recency decay follows the pinned half-life exactly", () => {
   for (let i = 1; i <= HALF_LIFE_DRAWS; i++) long.push(makeRec(T0 + i * 160_000, seq(21)));
   const s2 = computeStats(long[Symbol.iterator]());
   near(s2.decayedFreq[0], 0.5, 1e-9, "ball 1 after exactly one half-life of absence");
+});
+
+await check("schema 2 doctrine pins: half-life = one week of the 160 s cadence", () => {
+  eq(STATS_SCHEMA, 2, "stats schema");
+  eq(HALF_LIFE_DRAWS, 3780, "half-life: 7 × 540 draws — one week at 160 s");
+  eq(WEEK_DRAWS, 3780, "the weekly chi² window IS the half-life window, deliberately");
+});
+
+await check("sideBets aggregates count exactly what the archive says (display-only)", () => {
+  const recs = [
+    makeRec(T0, seq(1)),                                              // heads (20 low)
+    makeRec(T0 + 160_000, seq(61), { jackpotLevel: "major", bonusFactor: 10 }), // tails
+    makeRec(T0 + 320_000, [...seq(31).slice(0, 10), ...seq(41).slice(0, 10)],
+      { jackpotLevel: "minor", bonusFactor: 5 })                      // 10 low + 10 high = evens
+  ];
+  const s = computeStats(recs[Symbol.iterator]());
+  eq(s.sideBets.headsTails.heads, 1);
+  eq(s.sideBets.headsTails.tails, 1);
+  eq(s.sideBets.headsTails.evens, 1);
+  eq(s.sideBets.jackpot.regular, 1);
+  eq(s.sideBets.jackpot.minor, 1);
+  eq(s.sideBets.jackpot.major, 1);
+  eq(s.sideBets.bonus[1], 1);
+  eq(s.sideBets.bonus[5], 1);
+  eq(s.sideBets.bonus[10], 1);
+  eq(s.sideBets.bonus[2] + s.sideBets.bonus[3] + s.sideBets.bonus[4], 0, "unused factors stay 0");
 });
 
 await check("stats are deterministic — same records, same bytes", () => {
@@ -122,6 +148,13 @@ await check("corrected chi² ×(N−1)/(N−K) = ×79/60 reproduces the report: 
   eq(corrected.toFixed(2), "63.38", "corrected chi² vs the probe report");
   ok(corrected < chiCrit999(POOL - 1),
     `corrected ${corrected.toFixed(2)} must sit below crit999(79) = ${chiCrit999(POOL - 1).toFixed(2)} — real draws are uniform`);
+});
+
+await check("lib's chi2Corrected (the audit's weekly gate) reproduces the fixture exactly", () => {
+  // The audit runs this function over the trailing week every 6-hourly
+  // cycle; tying it to the probe-week fixture means the Action's reference
+  // can never drift from the report's 63.38.
+  eq(chi2Corrected(WEEK.freq, WEEK.n).toFixed(2), "63.38");
 });
 
 await check("the correction matters: raw chi² alone would understate the statistic by 24%", () => {
