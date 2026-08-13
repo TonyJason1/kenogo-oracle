@@ -1,0 +1,1615 @@
+{
+ "source": "probe capture 2026-08-06_00.json",
+ "items": [
+  {
+   "id": "18f0f81f-6b7d-4ce3-aee0-ea50049c21b6",
+   "externalId": "399",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    78,
+    42,
+    31,
+    73,
+    45,
+    67,
+    58,
+    80,
+    19,
+    24,
+    63,
+    51,
+    3,
+    79,
+    76,
+    48,
+    54,
+    61,
+    60,
+    21
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:01:00+00:00",
+   "closingDate": "2026-08-06T00:00:45+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "tails",
+    "jackpot": "minor",
+    "bonus": 1
+   },
+   "version": null
+  },
+  {
+   "id": "fca27b91-f594-406e-ad00-1a55dd90f9e2",
+   "externalId": "400",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    31,
+    16,
+    50,
+    29,
+    14,
+    71,
+    3,
+    76,
+    63,
+    28,
+    43,
+    5,
+    67,
+    22,
+    34,
+    26,
+    20,
+    69,
+    8,
+    68
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:03:40+00:00",
+   "closingDate": "2026-08-06T00:03:25+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "heads",
+    "jackpot": "major",
+    "bonus": 1
+   },
+   "version": null
+  },
+  {
+   "id": "4891a29a-0c4d-4e2f-b483-7bf889a01975",
+   "externalId": "401",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    31,
+    68,
+    62,
+    11,
+    25,
+    28,
+    76,
+    66,
+    48,
+    39,
+    74,
+    72,
+    27,
+    24,
+    20,
+    30,
+    18,
+    60,
+    54,
+    40
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:06:20+00:00",
+   "closingDate": "2026-08-06T00:06:05+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "heads",
+    "jackpot": "regular",
+    "bonus": 1
+   },
+   "version": null
+  },
+  {
+   "id": "0fbd2cda-93a3-4411-83d4-0e3f516429fc",
+   "externalId": "402",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    18,
+    25,
+    1,
+    2,
+    40,
+    16,
+    51,
+    15,
+    20,
+    30,
+    31,
+    4,
+    73,
+    41,
+    43,
+    9,
+    23,
+    35,
+    67,
+    32
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:09:00+00:00",
+   "closingDate": "2026-08-06T00:08:45+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "heads",
+    "jackpot": "regular",
+    "bonus": 3
+   },
+   "version": null
+  },
+  {
+   "id": "cc3ff4f0-b162-48a3-b323-e71faff57b80",
+   "externalId": "403",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    74,
+    52,
+    11,
+    31,
+    65,
+    6,
+    68,
+    48,
+    32,
+    45,
+    55,
+    13,
+    28,
+    40,
+    46,
+    29,
+    25,
+    59,
+    56,
+    77
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:11:40+00:00",
+   "closingDate": "2026-08-06T00:11:25+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "tails",
+    "jackpot": "regular",
+    "bonus": 2
+   },
+   "version": null
+  },
+  {
+   "id": "57b42867-d1b8-4be8-8aba-52c925e156ab",
+   "externalId": "404",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    69,
+    9,
+    26,
+    4,
+    62,
+    55,
+    59,
+    52,
+    67,
+    44,
+    66,
+    6,
+    21,
+    48,
+    71,
+    27,
+    28,
+    76,
+    15,
+    46
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:14:20+00:00",
+   "closingDate": "2026-08-06T00:14:05+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "tails",
+    "jackpot": "major",
+    "bonus": 4
+   },
+   "version": null
+  },
+  {
+   "id": "b548d9dd-5462-4346-9a61-b039422b7b90",
+   "externalId": "405",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    77,
+    46,
+    24,
+    12,
+    67,
+    69,
+    3,
+    48,
+    79,
+    66,
+    10,
+    52,
+    70,
+    38,
+    21,
+    22,
+    63,
+    7,
+    31,
+    2
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:17:00+00:00",
+   "closingDate": "2026-08-06T00:16:45+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "evens",
+    "jackpot": "regular",
+    "bonus": 1
+   },
+   "version": null
+  },
+  {
+   "id": "a0d69804-cbfc-4f0b-b1df-187bab822881",
+   "externalId": "406",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    51,
+    3,
+    56,
+    43,
+    35,
+    80,
+    52,
+    77,
+    71,
+    48,
+    64,
+    23,
+    49,
+    57,
+    61,
+    17,
+    6,
+    60,
+    68,
+    38
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:19:40+00:00",
+   "closingDate": "2026-08-06T00:19:25+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "tails",
+    "jackpot": "regular",
+    "bonus": 2
+   },
+   "version": null
+  },
+  {
+   "id": "61233e78-d399-45d6-b612-81d6f67c9c98",
+   "externalId": "407",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    66,
+    46,
+    20,
+    34,
+    42,
+    22,
+    54,
+    36,
+    31,
+    71,
+    62,
+    4,
+    18,
+    47,
+    79,
+    8,
+    56,
+    38,
+    53,
+    26
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:22:20+00:00",
+   "closingDate": "2026-08-06T00:22:05+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "evens",
+    "jackpot": "regular",
+    "bonus": 1
+   },
+   "version": null
+  },
+  {
+   "id": "e7a5817a-2b28-4fd1-9781-f35711a08b52",
+   "externalId": "408",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    21,
+    45,
+    61,
+    12,
+    14,
+    15,
+    44,
+    37,
+    77,
+    27,
+    31,
+    35,
+    16,
+    25,
+    58,
+    64,
+    23,
+    53,
+    22,
+    1
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:25:00+00:00",
+   "closingDate": "2026-08-06T00:24:45+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "heads",
+    "jackpot": "regular",
+    "bonus": 1
+   },
+   "version": null
+  },
+  {
+   "id": "5a54bdc9-b74b-406d-a5b2-e1dcf8254e6d",
+   "externalId": "409",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    2,
+    39,
+    80,
+    37,
+    25,
+    66,
+    71,
+    19,
+    51,
+    27,
+    41,
+    31,
+    52,
+    72,
+    13,
+    14,
+    55,
+    47,
+    70,
+    21
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:27:40+00:00",
+   "closingDate": "2026-08-06T00:27:25+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "evens",
+    "jackpot": "regular",
+    "bonus": 3
+   },
+   "version": null
+  },
+  {
+   "id": "9d8b78b2-65e4-403f-a057-e86ec6e823c4",
+   "externalId": "410",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    69,
+    33,
+    44,
+    12,
+    1,
+    67,
+    18,
+    24,
+    20,
+    72,
+    9,
+    70,
+    46,
+    2,
+    59,
+    11,
+    57,
+    49,
+    25,
+    55
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:30:20+00:00",
+   "closingDate": "2026-08-06T00:30:05+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "evens",
+    "jackpot": "major",
+    "bonus": 1
+   },
+   "version": null
+  },
+  {
+   "id": "0056f439-1d4a-4f44-b5bb-0fd6ee84f516",
+   "externalId": "411",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    4,
+    29,
+    16,
+    43,
+    70,
+    79,
+    19,
+    80,
+    74,
+    40,
+    75,
+    68,
+    54,
+    71,
+    33,
+    47,
+    6,
+    67,
+    66,
+    72
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:33:00+00:00",
+   "closingDate": "2026-08-06T00:32:45+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "tails",
+    "jackpot": "regular",
+    "bonus": 1
+   },
+   "version": null
+  },
+  {
+   "id": "e7cd98e0-a217-4e94-afe2-83f177054f15",
+   "externalId": "412",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    68,
+    50,
+    48,
+    79,
+    27,
+    54,
+    71,
+    64,
+    3,
+    46,
+    31,
+    43,
+    29,
+    30,
+    19,
+    38,
+    74,
+    77,
+    15,
+    5
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:35:40+00:00",
+   "closingDate": "2026-08-06T00:35:25+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "tails",
+    "jackpot": "minor",
+    "bonus": 2
+   },
+   "version": null
+  },
+  {
+   "id": "760dd6ce-d390-433a-b050-2e96a5b240a8",
+   "externalId": "413",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    80,
+    49,
+    42,
+    1,
+    20,
+    62,
+    54,
+    67,
+    76,
+    18,
+    50,
+    8,
+    21,
+    41,
+    17,
+    58,
+    26,
+    27,
+    29,
+    64
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:38:20+00:00",
+   "closingDate": "2026-08-06T00:38:05+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "tails",
+    "jackpot": "regular",
+    "bonus": 2
+   },
+   "version": null
+  },
+  {
+   "id": "0830a80e-e67b-4c3e-a67b-9140e85e98b0",
+   "externalId": "414",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    59,
+    57,
+    32,
+    14,
+    29,
+    60,
+    30,
+    13,
+    12,
+    66,
+    23,
+    16,
+    37,
+    7,
+    26,
+    79,
+    68,
+    43,
+    52,
+    40
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:41:00+00:00",
+   "closingDate": "2026-08-06T00:40:45+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "heads",
+    "jackpot": "minor",
+    "bonus": 3
+   },
+   "version": null
+  },
+  {
+   "id": "f2fd41b5-335e-45ba-a1cf-ce8d936e5abc",
+   "externalId": "415",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    31,
+    3,
+    52,
+    8,
+    35,
+    1,
+    26,
+    50,
+    73,
+    67,
+    47,
+    42,
+    2,
+    20,
+    46,
+    15,
+    9,
+    53,
+    14,
+    59
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:43:40+00:00",
+   "closingDate": "2026-08-06T00:43:25+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "heads",
+    "jackpot": "regular",
+    "bonus": 1
+   },
+   "version": null
+  },
+  {
+   "id": "c6418c67-10a6-44b7-ab78-9e1a84c365a2",
+   "externalId": "416",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    72,
+    50,
+    39,
+    28,
+    24,
+    10,
+    54,
+    67,
+    38,
+    2,
+    14,
+    26,
+    15,
+    1,
+    22,
+    34,
+    27,
+    19,
+    65,
+    69
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:46:20+00:00",
+   "closingDate": "2026-08-06T00:46:05+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "heads",
+    "jackpot": "minor",
+    "bonus": 1
+   },
+   "version": null
+  },
+  {
+   "id": "f657c1a4-3273-440b-ad00-1b5c17bbdd93",
+   "externalId": "417",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    21,
+    41,
+    79,
+    62,
+    50,
+    36,
+    9,
+    4,
+    13,
+    10,
+    72,
+    75,
+    48,
+    61,
+    59,
+    20,
+    77,
+    7,
+    6,
+    49
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:49:00+00:00",
+   "closingDate": "2026-08-06T00:48:45+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "tails",
+    "jackpot": "regular",
+    "bonus": 3
+   },
+   "version": null
+  },
+  {
+   "id": "5bfa4194-2cdd-4777-bf81-8171d9b0de3e",
+   "externalId": "418",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    52,
+    60,
+    5,
+    42,
+    27,
+    29,
+    43,
+    78,
+    35,
+    36,
+    16,
+    23,
+    30,
+    12,
+    68,
+    58,
+    28,
+    71,
+    54,
+    9
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:51:40+00:00",
+   "closingDate": "2026-08-06T00:51:25+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "heads",
+    "jackpot": "regular",
+    "bonus": 2
+   },
+   "version": null
+  },
+  {
+   "id": "f6517191-be9b-4db2-8946-f4a1017ab4f7",
+   "externalId": "419",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    22,
+    39,
+    15,
+    10,
+    16,
+    61,
+    45,
+    11,
+    34,
+    38,
+    3,
+    28,
+    31,
+    65,
+    72,
+    5,
+    2,
+    19,
+    66,
+    26
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:54:20+00:00",
+   "closingDate": "2026-08-06T00:54:05+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "heads",
+    "jackpot": "regular",
+    "bonus": 2
+   },
+   "version": null
+  },
+  {
+   "id": "4b845d06-84b4-4602-9cb0-8dc79b67489c",
+   "externalId": "420",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    66,
+    23,
+    11,
+    47,
+    21,
+    58,
+    59,
+    24,
+    78,
+    29,
+    71,
+    77,
+    2,
+    56,
+    60,
+    8,
+    46,
+    14,
+    44,
+    62
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:57:00+00:00",
+   "closingDate": "2026-08-06T00:56:45+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "tails",
+    "jackpot": "minor",
+    "bonus": 3
+   },
+   "version": null
+  },
+  {
+   "id": "9ad2b401-62ab-4bf5-8e96-2c3c96fb4da9",
+   "externalId": "421",
+   "productId": "kenoGo",
+   "state": "finished",
+   "numbers": [
+    11,
+    43,
+    12,
+    44,
+    53,
+    42,
+    41,
+    29,
+    72,
+    45,
+    80,
+    68,
+    24,
+    49,
+    52,
+    4,
+    75,
+    58,
+    48,
+    66
+   ],
+   "additionalNumbers": null,
+   "jackpots": [
+    {
+     "jackpot": 100000000,
+     "subgame": "",
+     "baseJackpot": 0,
+     "marketingJackpot": 100000000,
+     "baseMarketingJackpot": 0,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 100000000,
+     "subgame": "jackpotRegular",
+     "marketingJackpot": 100000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 1000000000,
+     "subgame": "jackpotMinor",
+     "marketingJackpot": 1000000000,
+     "currency": "AUD"
+    },
+    {
+     "jackpot": 4000000000,
+     "subgame": "jackpotMajor",
+     "marketingJackpot": 4000000000,
+     "currency": "AUD"
+    }
+   ],
+   "additionalResults": null,
+   "drawingDate": "2026-08-06T00:59:40+00:00",
+   "closingDate": "2026-08-06T00:59:25+00:00",
+   "drawingDateWd": "4",
+   "closingDateWd": "4",
+   "config": null,
+   "drawingType": "NORMAL",
+   "sideBetResults": {
+    "headsTails": "tails",
+    "jackpot": "minor",
+    "bonus": 3
+   },
+   "version": null
+  }
+ ]
+}

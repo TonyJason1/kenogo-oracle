@@ -1,0 +1,58 @@
+# Full suite on every push and pull request.
+#
+# Split from update-data.yml on purpose. That workflow refreshes the shipped
+# archive and must stay free of third-party packages; this one may install
+# devDependencies, because the DOM tests need jsdom and it never writes to the
+# repository (`contents: read`).
+name: CI
+
+on:
+  push:
+    branches: [main, "review/**"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+
+      # Proves the shipped app still has zero runtime dependencies. If anything
+      # ever lands outside devDependencies this fails before the suite runs.
+      - name: Assert zero production dependencies
+        run: |
+          node -e '
+            const lock = require("./package-lock.json");
+            const prod = Object.entries(lock.packages)
+              .filter(([name, meta]) => name !== "" && !meta.dev)
+              .map(([name]) => name);
+            if (prod.length) {
+              console.error("Production dependencies found:", prod.join(", "));
+              process.exit(1);
+            }
+            console.log(`ok — ${Object.keys(lock.packages).length - 1} lockfile entries, all devDependencies`);
+          '
+
+      - run: npm ci
+
+      - name: Core suite (no third-party code)
+        run: npm run test:core
+
+      - name: DOM suite (jsdom)
+        run: npm run test:dom
+
+      - name: Offline archive reconciliation
+        run: node scripts/audit-data.mjs

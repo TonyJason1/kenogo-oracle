@@ -1,0 +1,5 @@
+# LF everywhere, on purpose. The archive parsers are strict by design
+# (tamper detection); a CRLF checkout must never be able to make good data
+# look torn. PNGs are the only binaries.
+* text=auto eol=lf
+*.png binary

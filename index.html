@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>KenoGO Oracle</title>
+  <meta name="description" content="Cryptographically secure KenoGO quick picks with an animated 80-ball chamber, over a live draw archive. Works offline." />
+  <meta name="theme-color" content="#0d1230" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.webmanifest" />
+
+  <!-- iOS home screen -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="KenoGO Oracle" />
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon-180.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <h1>KenoGO <span class="brand">ORACLE</span></h1>
+      <p class="tagline">Crypto-random picks. The chamber is just for show.</p>
+    </header>
+
+    <!-- 80-ball chamber -->
+    <section class="machine" aria-label="Ball chamber">
+      <div class="chamber-wrap">
+        <canvas id="chamber" aria-hidden="true"></canvas>
+        <div class="skip-hint" id="skipHint" hidden>tap anywhere to skip</div>
+      </div>
+      <!-- Persisted preference: skip the animation entirely. Reduced-motion
+           users get the instant path regardless of this toggle. -->
+      <label class="fast-toggle" for="fastReveal">
+        <input type="checkbox" id="fastReveal" />
+        Fast reveal
+      </label>
+    </section>
+
+    <!-- Controls: spots + lines. Values are role="spinbutton" so a change
+         announces itself; arrows/Home/End are wired in app.js. -->
+    <section class="card controls" id="pickControls">
+      <div class="qty-row">
+        <div class="qty-ctl">
+          <span class="qty-label" id="spotsLabel">Spots</span>
+          <button type="button" class="step-btn" data-q="spots" data-dir="-1" aria-label="Fewer spots">−</button>
+          <span class="qty-val" id="spotsVal" role="spinbutton" tabindex="0"
+                aria-labelledby="spotsLabel" aria-valuenow="10" aria-valuemin="1" aria-valuemax="10">10</span>
+          <button type="button" class="step-btn" data-q="spots" data-dir="1" aria-label="More spots">+</button>
+        </div>
+        <div class="qty-ctl">
+          <span class="qty-label" id="linesLabel">Lines</span>
+          <button type="button" class="step-btn" data-q="lines" data-dir="-1" aria-label="Fewer lines">−</button>
+          <span class="qty-val" id="linesVal" role="spinbutton" tabindex="0"
+                aria-labelledby="linesLabel" aria-valuenow="1" aria-valuemin="1" aria-valuemax="10">1</span>
+          <button type="button" class="step-btn" data-q="lines" data-dir="1" aria-label="More lines">+</button>
+        </div>
+      </div>
+      <p class="matrix-line" id="matrixLine">10 spots from 1–80 · drawn 20-from-80 every 160 s</p>
+    </section>
+
+    <!-- Results -->
+    <section class="card results" id="resultsCard" hidden>
+      <div class="results-head">
+        <h2>Your numbers</h2>
+        <button type="button" class="ghost-btn" id="copyAllBtn">Copy all</button>
+      </div>
+      <!-- Not a live region: one coalesced summary goes to #revealStatus once
+           the line is complete, never one announcement per ball. -->
+      <div id="resultsList"></div>
+      <p id="revealStatus" class="sr-only" role="status" aria-live="polite"></p>
+    </section>
+
+    <!-- History -->
+    <details class="card history" id="historyBox">
+      <summary>
+        <span>History</span>
+        <span class="spec" id="historyCount">0</span>
+      </summary>
+      <div id="historyList"></div>
+      <button type="button" class="ghost-btn danger" id="clearHistoryBtn">Clear history</button>
+    </details>
+
+    <footer class="foot">
+      Random picks don't change the odds. Gamble responsibly —
+      <a href="https://www.gamblinghelponline.org.au" rel="noopener">gamblinghelponline.org.au</a>
+      <!-- The version is static text in the versioned shell, so it always
+           names the build a device is actually running (even with JS dead);
+           test/version.test.mjs pins it to package.json + sw.js. The archive
+           line is filled from data/stats.json at runtime and tightened by the
+           live top-up — data commits ship without a VERSION bump, so it
+           cannot live in this file. -->
+      <p class="build">v0.1.0<span id="dataThrough"></span></p>
+    </footer>
+  </div>
+
+  <!-- DRAW (fixed bar; the disclaimer rides in it as a fixed footer) -->
+  <div class="drawbar">
+    <button type="button" id="drawBtn" class="draw-btn">DRAW</button>
+    <p class="bar-note" id="barNote">For entertainment only — every combination of your spot count has identical odds.</p>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

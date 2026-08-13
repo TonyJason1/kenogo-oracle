@@ -1,0 +1,118 @@
+# 6-hourly archive refresh.
+#
+# Walks at most RUN_BUCKETS hour buckets from the archive tail (validate-
+# before-write: the chain-gap law gates every append), rebuilds
+# data/stats.json from the files on disk, audits in --strict mode, re-runs the
+# zero-dependency core suite, and commits data/ when it changed. Clients pick
+# the new stats up through the service worker's runtime data cache — data
+# commits never need a sw.js VERSION bump.
+#
+# CATCH-UP: while the one-off local backfill still owns the walk (archive tail
+# > CATCHUP_BUCKETS behind the clock), update-data.mjs emits mode=catchup and
+# every later step skips — the Action must not race the backfill for the
+# cursor, and an expected gap must not open failure issues.
+#
+# SUPPLY CHAIN: this job deliberately never runs `npm install`. Every script
+# and test it invokes depends only on Node builtins and repo code, so no
+# third-party package executes anywhere in the data pipeline. The DOM tests,
+# which need jsdom, live in ci.yml instead. Keep it that way.
+#
+# Actions are pinned to immutable commit SHAs, not tags: this job holds
+# `contents: write` and pushes to the default branch, so a moved tag on a
+# third-party action would be able to rewrite the app that ships to users.
+name: Update archive
+
+on:
+  schedule:
+    - cron: "23 */6 * * *" # every 6 h, off the top-of-hour crush
+  workflow_dispatch:
+
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write # commit refreshed data/
+      issues: write # open a tracking issue when the pipeline breaks
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+
+      - name: Incremental walk + stats rebuild
+        id: update
+        run: node scripts/update-data.mjs
+
+      # --strict: the updater has just run, so the archive must actually be
+      # current. Without it a silently stalled fetch would still reconcile.
+      - name: Reconciliation audit (chain, ledger, stats, freshness)
+        if: steps.update.outputs.mode == 'steady'
+        run: node scripts/audit-data.mjs --strict
+
+      - name: Validate updated data (zero-dependency core suite)
+        if: steps.update.outputs.mode == 'steady'
+        run: npm run test:core
+
+      - name: Commit and push if changed
+        if: steps.update.outputs.mode == 'steady'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898994+github-actions[bot]@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then
+            echo "No new draws this cycle."
+          else
+            git commit -m "data: 6-hourly archive update"
+            git push
+          fi
+
+      # A dead pipeline must be loud. Without this the schedule can fail every
+      # cycle in silence while the app quietly serves ageing stats — the exact
+      # failure mode the freshness check exists to expose.
+      - name: Open a tracking issue on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set +e
+          gh label create pipeline-failure \
+            --color B60205 \
+            --description "6-hourly archive update failure" >/dev/null 2>&1
+
+          body=$(printf '%s\n' \
+            "The 6-hourly archive update failed." \
+            "" \
+            "Run: $RUN_URL" \
+            "" \
+            "\`data/\` was **not** updated, so the app keeps serving the last good" \
+            "commit. Staleness, not corruption — but staleness left alone becomes" \
+            "a trust problem." \
+            "" \
+            "Likely causes, in the order the steps run:" \
+            "" \
+            "- **Walk** — API unreachable, an empty past bucket (suspected hole)," \
+            "  a payload rejected by parseItem, or a chain-gap refusal." \
+            "- **Audit \`--strict\`** — chain, ledger reconciliation, stats drift," \
+            "  or freshness past the strict budget." \
+            "- **Tests** — an invariant pin." \
+            "" \
+            "This issue is reused while it stays open; each failure adds a comment.")
+
+          existing=$(gh issue list --state open --label pipeline-failure \
+            --limit 1 --json number --jq '.[0].number // empty' 2>/dev/null)
+
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create \
+              --title "6-hourly archive update failed" \
+              --body "$body" \
+              --label pipeline-failure
+          fi

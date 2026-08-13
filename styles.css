@@ -1,0 +1,244 @@
+/* KenoGO Oracle — deep indigo, amber accent, high contrast, 44px+ targets.
+ * Structure inherited from quickpick-au (proven contrast + safe-area rules). */
+:root {
+  --navy: #0d1230;
+  --navy-2: #151b45;
+  --card: #171e4e;
+  --line: rgba(255, 255, 255, 0.1);
+  --ink: #f0f2ff;
+  --muted: #a3aede;
+  --accent: #ffb02e;       /* KenoGO Oracle amber */
+  --accent-ink: #201302;   /* text ON amber surfaces (contrast) */
+  --radius: 16px;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { color-scheme: dark; }
+
+/* Announced, never shown — the coalesced reveal summary lives here. */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Keyboard-reachable spans (spinbutton values) carry no default focus ring,
+ * and custom backgrounds make the UA ring hard to see against the indigo.
+ * One explicit, high-contrast indicator for all interactive surfaces. */
+:is(.step-btn, .draw-btn, .copy-btn, .ghost-btn,
+    [role="spinbutton"], summary):focus-visible {
+  outline: 3px solid #ffd34d;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, #1d2568 0%, var(--navy) 55%) fixed,
+    var(--navy);
+  color: var(--ink);
+  font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+  padding-top: env(safe-area-inset-top);
+}
+
+.app {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 12px 14px 150px;
+  padding-left: max(14px, env(safe-area-inset-left));
+  padding-right: max(14px, env(safe-area-inset-right));
+  /* The draw bar is opaque, so anything under it is HIDDEN, not ghosted —
+   * clearance covers the bar's full height (button + note + safe-area). */
+  padding-bottom: calc(170px + env(safe-area-inset-bottom));
+}
+
+/* ---------- header ---------- */
+.topbar { text-align: center; padding: 8px 0 4px; }
+.topbar h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+.topbar .brand { color: var(--accent); }
+.tagline { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+
+/* ---------- ball chamber ---------- */
+.machine { margin: 8px 0 12px; }
+.chamber-wrap {
+  position: relative;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.22)), var(--navy-2);
+  overflow: hidden;
+  box-shadow: inset 0 -14px 26px rgba(0,0,0,.35);
+}
+#chamber { display: block; width: 100%; height: min(48vh, 360px); }
+.skip-hint {
+  position: absolute; right: 10px; bottom: 8px;
+  font-size: 11px; color: var(--muted);
+  background: rgba(0,0,0,.35);
+  padding: 4px 8px; border-radius: 8px;
+  pointer-events: none;
+}
+
+.fast-toggle {
+  display: flex; align-items: center; justify-content: flex-end; gap: 7px;
+  min-height: 44px;
+  margin-top: 2px;
+  font-size: 12px; color: var(--muted);
+  user-select: none; -webkit-user-select: none;
+  cursor: pointer;
+}
+.fast-toggle input {
+  width: 16px; height: 16px; margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* ---------- cards / controls ---------- */
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin: 0 0 12px;
+}
+
+.qty-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 26px;
+}
+.qty-ctl { display: flex; align-items: center; gap: 8px; }
+.qty-label { font-size: 12px; font-weight: 700; letter-spacing: .04em; color: var(--muted); }
+.qty-val {
+  min-width: 30px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+}
+.step-btn {
+  width: 48px; height: 44px; flex: 0 0 auto;
+  border-radius: 12px; border: 1px solid var(--line);
+  background: var(--navy-2); color: var(--ink);
+  font-size: 22px; font-weight: 700; line-height: 1;
+  cursor: pointer; touch-action: manipulation;
+}
+.step-btn:active { transform: scale(.96); }
+.step-btn[disabled] { opacity: .35; cursor: default; }
+
+.matrix-line { margin: 12px 0 0; font-size: 12px; color: var(--muted); text-align: center; }
+.spec { color: var(--accent); font-weight: 800; font-variant-numeric: tabular-nums; }
+
+/* ---------- results ---------- */
+.results-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.results-head h2 { margin: 0; font-size: 15px; letter-spacing: .06em; }
+
+.line {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 0;
+  border-top: 1px solid var(--line);
+}
+.line:first-child { border-top: 0; }
+.line-no { flex: 0 0 24px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.pills { flex: 1; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+
+.pill {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 35% 30%, #ffffff 0%, #f4e9cf 70%, #e8cf9a 100%);
+  border: 3px solid var(--accent);
+  color: #201302; font-weight: 800; font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+.pill.placeholder {
+  background: rgba(255,255,255,.06);
+  border: 2px dashed var(--line);
+  color: transparent;
+}
+.pill.pop { animation: pop .32s cubic-bezier(.2,1.4,.4,1); }
+@keyframes pop { 0% { transform: scale(.3); } 100% { transform: scale(1); } }
+
+.copy-btn {
+  flex: 0 0 auto; min-width: 44px; min-height: 44px;
+  border-radius: 12px; border: 1px solid var(--line);
+  background: transparent; color: var(--muted);
+  font-size: 16px; cursor: pointer; touch-action: manipulation;
+}
+.copy-btn.copied { color: #6fe3a1; border-color: #6fe3a1; }
+
+.ghost-btn {
+  min-height: 44px; padding: 0 14px;
+  border-radius: 12px; border: 1px solid var(--line);
+  background: transparent; color: var(--ink);
+  font: 600 13px/1 inherit; font-family: inherit;
+  cursor: pointer; touch-action: manipulation;
+}
+.ghost-btn.danger { color: #ff8ba0; border-color: rgba(255,139,160,.4); width: 100%; margin-top: 10px; }
+
+/* ---------- history ---------- */
+.history summary {
+  display: flex; justify-content: space-between; align-items: center;
+  cursor: pointer; list-style: none;
+  min-height: 30px; font-weight: 600; font-size: 14px;
+}
+.history summary::-webkit-details-marker { display: none; }
+.h-item { border-top: 1px solid var(--line); padding: 9px 0; font-size: 13px; }
+.h-item:first-child { margin-top: 10px; }
+.h-empty {
+  border-top: 1px solid var(--line);
+  margin: 10px 0 0;
+  padding: 12px 0 4px;
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+}
+.h-meta { display: flex; justify-content: space-between; color: var(--muted); margin-bottom: 3px; }
+.h-meta .g { color: var(--ink); font-weight: 700; }
+.h-nums { font-variant-numeric: tabular-nums; word-break: break-word; white-space: pre-line; }
+
+/* ---------- draw bar ---------- */
+.drawbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+  padding: 10px max(14px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+  /* OPAQUE, deliberately: a fade gradient lets scrolled history ghost through
+   * the button and disclaimer. The border marks the edge instead. */
+  background: #090d24;
+  border-top: 1px solid var(--line);
+}
+.draw-btn {
+  display: block; width: 100%; max-width: 492px; margin: 0 auto;
+  height: 58px; border: 0; border-radius: 18px;
+  background: var(--accent); color: var(--accent-ink);
+  font: 800 19px/1 inherit; font-family: inherit; letter-spacing: .2em;
+  cursor: pointer; touch-action: manipulation;
+  box-shadow: 0 8px 22px rgba(0,0,0,.4);
+  transition: transform .08s, opacity .2s;
+}
+.draw-btn:active { transform: scale(.98); }
+.draw-btn[disabled] { opacity: .55; }
+.bar-note {
+  margin: 8px auto 0;
+  max-width: 492px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* ---------- footer ---------- */
+.foot { text-align: center; font-size: 11.5px; color: var(--muted); padding: 6px 8px 4px; }
+.foot a { color: var(--muted); }
+.foot .build { margin: 6px 0 0; font-size: 10.5px; opacity: .75; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
