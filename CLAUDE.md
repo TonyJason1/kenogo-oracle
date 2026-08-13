@@ -11,9 +11,18 @@ shell/data cache split, version triple, zero-dep data pipeline).
 ## Game facts (pinned 2026-08-13, probe session)
 
 - 20 numbers drawn from 1–80, every **160 seconds, 24/7** (540 draws/day).
-- **Era pin:** cadence was **180 s** (480/day) from the API floor to
-  2024-05-20, **160 s** since 2024-05-21 (`ERA_160_START` in scripts/lib.mjs).
-  The single era-crossing pair is flagged and logged, never silently accepted.
+- **Era pin (MEASURED 2026-08-14 from the archive walk):** 180 s (480/day)
+  from the API floor through the last finished draw at
+  **2024-05-20T15:00:00Z**; one suspended (never finished) draw at ~15:02:55;
+  ~31.5 min changeover outage; **160 s from 2024-05-20T15:31:40Z** exactly
+  (`ERA_160_START_MS` in scripts/lib.mjs). The crossing pair (gap 1900 s) is
+  the single era-crossing entry in data/anomalies.json — flagged and logged,
+  never silently accepted. The probe's date-level "since 2024-05-21" was
+  8.5 h coarse; the walk's refusal at the boundary is what pinned the truth.
+  Changeover-day quirk: the final 180 s hours carry a parallel GHOST series
+  of `suspended` placeholder items ~175 s behind each real draw (bucket 14
+  = 20 finished + 20 suspended). Finished-only ingestion makes them
+  invisible to the archive; they only show up as the skip counter.
 - API floor: **2022-10-18T00:00Z** (starts mid-cycle at game 129 — truncation
   point, possibly rolling retention). ≈718k draws retrievable at probe time.
 - `externalId` cycles **1..999 then wraps (~44.4 h)** — it is NOT a daily

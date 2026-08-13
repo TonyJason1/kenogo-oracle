@@ -32,10 +32,14 @@ export const USER_AGENT = "kenogo-oracle data pipeline (github.com/TonyJason1/ke
  * a truncation point, possibly rolling retention; floor-scan handles drift). */
 export const FLOOR_BUCKET = "2022-10-18T00";
 
-/** Cadence era pin (probe 2026-08-13): 180 s per draw from the floor through
- * 2024-05-20, 160 s since 2024-05-21. The exact crossing gap is unknown until
- * the backfill walks it; the single era-crossing pair is ledgered, not fatal. */
-export const ERA_160_START_MS = Date.parse("2024-05-21T00:00:00Z");
+/** Cadence era pin — MEASURED from the archive walk 2026-08-14 (the probe's
+ * date-level "since 2024-05-21" was 8.5 h coarse): the last finished 180 s
+ * draw is 2024-05-20T15:00:00Z, one SUSPENDED draw sits at ~15:02:55 (never
+ * finished — excluded by doctrine), then a ~31.5 min changeover outage, and
+ * the 160 s era begins at exactly 2024-05-20T15:31:40Z (gap 1900 s, ledgered
+ * as the single era-crossing anomaly). Verified steady 160 s through the
+ * 16:00 and 23:00 buckets of the same day. */
+export const ERA_160_START_MS = Date.parse("2024-05-20T15:31:40Z");
 export const GAP_160_MS = 160_000;
 export const GAP_180_MS = 180_000;
 

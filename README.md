@@ -14,8 +14,9 @@ under frame pressure it degrades its ball count, never the selection.**
 ## The game
 
 20 numbers from 1–80, drawn every **160 seconds, 24/7** (540 draws/day;
-180 s per draw before 2024-05-21). Players pick 1–10 spots. Side bets:
-Heads/Tails/Evens (1–40 vs 41–80), jackpot level, bonus multiplier.
+180 s per draw before the measured changeover at 2024-05-20T15:31:40Z).
+Players pick 1–10 spots. Side bets: Heads/Tails/Evens (1–40 vs 41–80),
+jackpot level, bonus multiplier.
 
 The app: Spots 1–10 (default 10), Lines 1–10, DRAW → chamber reveal (tap
 anywhere or Escape to skip; Fast-reveal toggle and reduced-motion get the
